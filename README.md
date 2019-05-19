@@ -2,6 +2,19 @@
 
 This is the starter code for the Route Planning project. Instructions for each exercise can be found in the `instructions` directory, and unit tests for some exercises in the `test` directory.
 
+## Note on final solution in this Repository
+
+The original [accepted solution](https://github.com/dbecad/CppND-Route-Planning-Project/releases/tag/V1.0) has a bug and will find erroneous solutions.
+
+The bug is in ```void RouteModel::Node::FindNeighbors()``` function that does not consider the sequential nature of the nodes in a ```Model::Way```.
+
+The only valid neighbors are the previous and next node in the list and the distance is not a relevant factor:
+```Model::Way.nodes = [A,B,C,D,E,F]```
+From Node C, the only valid neigbors are B and D if they were not visited yet.
+
+You can see the results on the left column and the real solution on the right:
+![Correct Solutions](/results/CorrectedResults.png)
+
 ## Cloning
 
 When cloning this project, be sure to use the `--recurse-submodules` flag. Using HTTPS:
