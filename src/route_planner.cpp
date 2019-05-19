@@ -23,6 +23,9 @@ void RoutePlanner::AStarSearch()
 {
     //Set start node to visited & push to list
     start_node->visited = true;
+    start_node->g_value = 0;
+    start_node->h_value = start_node->distance(*end_node); 
+
     open_list.push_back(start_node);
 
     //process open list until empty of destination is reached
