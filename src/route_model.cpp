@@ -18,17 +18,44 @@ float RouteModel::Node::distance(const Model::Node &otherNode) const
 
 //Populate the neighbors vector of this node 
 //   (closest nodes on all roads this node is on)
+//
+//Note : original course solution is buggy as it does not consider the "linear/ordered" nature
+//       of the Nodes in a way: the only possible neigbors are the one just before and after the
+//       current node in the list, distance is not relevant in the selection
 void RouteModel::Node::FindNeighbors()
 {
     //For each roads going through the node (from reverese map)
     for (const Model::Road *roadPtr : parent_model->GetNodeToRoadMap()[index])
     {
-        //Find closest non-visited node in the way list
-        RouteModel::Node* closest = FindNeighbor(parent_model->Ways()[roadPtr->way].nodes);
+        //Find two connected neigbors to current node
+        RouteModel::Node *prevNode = nullptr, *nextNode = nullptr;
+        vector<int> nodeList = parent_model->Ways()[roadPtr->way].nodes;
+        for (int currIndex = 0; currIndex < nodeList.size(); currIndex++)
+        {
+            //if current node is the one searched stop the search
+            if (nodeList[currIndex] == index)
+            {
+                //check if there one after non visited and add it
+                if (currIndex != nodeList.size() - 1)
+                    if (parent_model->SNodes()[nodeList[currIndex + 1]].visited == false)
+                        nextNode = &parent_model->SNodes()[nodeList[currIndex + 1]];
+                break;
+            }
+            else
+            {
+                //keep that as the previous node if it was not visited (or clear it otherwise)
+                if (parent_model->SNodes()[nodeList[currIndex]].visited == false)
+                    prevNode = &parent_model->SNodes()[nodeList[currIndex]];
+                else
+                    prevNode = nullptr;
+            }            
+        } 
 
-        //If one was found, store it as a neigbor
-        if (closest != nullptr)
-            neighbors.push_back(closest);
+        //Add prev/next if available
+        if (nextNode != nullptr)
+            neighbors.push_back(nextNode);
+        if (prevNode != nullptr)
+            neighbors.push_back(prevNode);
     }
 }
 
